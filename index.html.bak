@@ -153,7 +153,7 @@
 	</div>
 	
 	    <div class="div_btn" id="btn-make">
-        <a id='moreLink' href="/jump.php"><span>制作</span></a>
+        <a id='moreLink' href="https://mp.weixin.qq.com/s/QWXH_GXn6Wo9cTmSPki-Pg"><span>制作</span></a>
     </div>
     <div class="div_btn" id='div_support'>
         <a id='moreLink' href="https://mp.weixin.qq.com/s/QWXH_GXn6Wo9cTmSPki-Pg"><span>更多</span></a>
