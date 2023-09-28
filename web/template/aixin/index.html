@@ -1,0 +1,730 @@
+<?php 
+$daojiri = getChunjieDay();//除夕倒计日
+$yuanri = (int)(getSubstr($data['content'],'还有','天除夕'));//原来的日子
+if($yuanri){
+    $data['content'] = str_replace("还有". $yuanri ."天除夕","还有". $daojiri ."天除夕",$data['content']);
+}
+
+$daojiri = getChunjieDay() + 1;//春节倒计日
+$yuanri = (int)(getSubstr($data['content'],'还有','天过年'));//原来的日子
+if($yuanri){
+    $data['content'] = str_replace("还有". $yuanri ."天过年","还有". $daojiri ."天过年",$data['content']);
+}
+$yuanri = (int)(getSubstr($data['content'],'还有','天春节'));//原来的日子
+if($yuanri){
+    $data['content'] = str_replace("还有". $yuanri ."天春节","还有". $daojiri ."天春节",$data['content']);
+}
+?><!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script>
+        //判断客户端设备，选择写入meta
+        function init_viewport() {
+            if (navigator.userAgent.indexOf('Android') != -1) {
+                var version = parseFloat(RegExp.$1);
+                if (version > 2.3) {
+                    var width = window.outerWidth == 0 ? window.screen.width : window.outerWidth;
+                    var phoneScale = parseInt(width) / 500;
+                    document.write('<meta name="viewport" content="width=500, minimum-scale = ' + phoneScale + ', maximum-scale = ' + phoneScale + ', target-densitydpi=device-dpi">');
+                } else {
+                    document.write('<meta name="viewport" content="width=500, target-densitydpi=device-dpi, user-scalable=0">');
+                }
+            } else if (navigator.userAgent.indexOf('iPhone') != -1) {
+                var phoneScale = parseInt(window.screen.width) / 500;
+                document.write('<meta name="viewport" content="width=500, min-height=750, initial-scale=' + phoneScale + ', maximum-scale=' + phoneScale + ', user-scalable=0" /> ');         //0.75   0.82
+            } else {
+                document.write('<meta name="viewport" content="width=500, height=750, initial-scale=0.64" /> '); //0.75  0.82
+            }
+        }
+        init_viewport();
+    </script>
+    <title>{$data['title']}</title>
+    <style type="text/css">
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: #000;
+      }
+      canvas {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+      #pinkboard {
+        animation: anim 1.5s ease-in-out infinite;
+        -webkit-animation: anim 1.5s ease-in-out infinite;
+        -o-animation: anim 1.5s ease-in-out infinite;
+        -moz-animation: anim 1.5s ease-in-out infinite;
+      }
+      @keyframes anim {
+        0% {
+          transform: scale(0.8);
+        }
+        25% {
+          transform: scale(0.7);
+        }
+        50% {
+          transform: scale(1);
+        }
+        75% {
+          transform: scale(0.7);
+        }
+        100% {
+          transform: scale(0.8);
+        }
+      }
+      @-webkit-keyframes anim {
+        0% {
+          -webkit-transform: scale(0.8);
+        }
+        25% {
+          -webkit-transform: scale(0.7);
+        }
+        50% {
+          -webkit-transform: scale(1);
+        }
+        75% {
+          -webkit-transform: scale(0.7);
+        }
+        100% {
+          -webkit-transform: scale(0.8);
+        }
+      }
+      @-o-keyframes anim {
+        0% {
+          -o-transform: scale(0.8);
+        }
+        25% {
+          -o-transform: scale(0.7);
+        }
+        50% {
+          -o-transform: scale(1);
+        }
+        75% {
+          -o-transform: scale(0.7);
+        }
+        100% {
+          -o-transform: scale(0.8);
+        }
+      }
+      @-moz-keyframes anim {
+        0% {
+          -moz-transform: scale(0.8);
+        }
+        25% {
+          -moz-transform: scale(0.7);
+        }
+        50% {
+          -moz-transform: scale(1);
+        }
+        75% {
+          -moz-transform: scale(0.7);
+        }
+        100% {
+          -moz-transform: scale(0.8);
+        }
+      }
+      #name {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        margin-top: -20px;
+        font-size: 46px;
+        color: #ea80b0;
+      }
+
+      #contentToWrite {
+        font-size: 26px;
+        position: absolute;
+        left: 50%;
+        top: 47%;
+        transform: translate(-48%, 0);
+        /* margin-left:-80px;*/
+      }
+
+      audio {
+        display: none;
+      }
+       .div_btn a{color:#fff;text-decoration:none;}
+    .div_btn {
+	position: fixed;
+	cursor: pointer;
+	width: 42px;
+	height: 42px;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	font-size: 1em;
+	line-height: 40px;
+	text-align: center;
+	z-index: 999
+}
+    #btn-make {
+	bottom: 180px;
+	right: 30px;
+	background-color: rgba(0,0,0,.3)
+}
+
+#div_support {
+	bottom: 120px;
+	right: 30px;
+	background-color: rgba(0,0,0,.3)
+}
+    </style>
+  </head>
+  <body>
+    <div id="contentToWrite" class="comments" style="color: pink">
+      {$data['content']}
+    </div>
+    <audio id="audio_music" autoplay="autoplay" preload="auto" loop>
+        <source src="{$data.music_url}" type="audio/mpeg" />
+        <embed id="main_audio_ie8" hidden="true" autostart="true" height="0" width=0 loop="true" src="{$data.music_url}" autoplay="autoplay"/>
+    </audio>
+
+    <canvas id="pinkboard" width="1920" height="947"></canvas>
+
+    <canvas id="canvas" width="1920" height="947"></canvas>
+
+    {if (!is_we_show() && !isset($_GET['is_demo']))}
+    {if (isset($data['hide_more']) && $data['hide_more'] == 0) || (!isset($data['hide_more']))}
+    <div class="div_btn" id="btn-make">
+        <a id='moreLink' href="/jump.php"><span>制作</span></a>
+    </div>
+    <div class="div_btn" id='div_support'>
+        <a id='moreLink' href="https://mp.weixin.qq.com/s/QWXH_GXn6Wo9cTmSPki-Pg"><span>更多</span></a>
+    </div>
+    <div class="div_btn" id='div_wph' style="bottom: 70px; right: 35px;border:0px; ">
+        <a href="https://mst.vip.com/iYcEvwVGaLI-Bf_5PtVKAQ.php?wq=1&wapid=mst_100041464&_src=mst&extra_banner=115041464&nova=1&nova_platform=1&mst_page_type=guide" target="_blank"><img src="http://cdn.jcelyj.com/assets/TP1ayxwab/banner.jpg" width="50px" height="50px"/></a>
+    </div>
+    {/if}
+
+    {/if}
+    
+    
+    {if is_we_show() || isset($_GET['is_demo'])}
+
+    <script
+      type="text/javascript"
+      src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"
+    ></script>
+    <style>
+      #action .btn {
+        font-size: 1.2rem;
+        background-color: #2196f3;
+      }
+      #action .btn-return {
+        float: left;
+        color: #000;
+        border-radius: 0 25px 25px 0;
+        padding: 0.8rem 2.4rem 0.8rem 2.4rem;
+        color: #fff;
+        box-shadow: 0.2rem 0 0.2rem #888888;
+      }
+      #action .btn-make {
+        float: right;
+        color: #000;
+        border-radius: 25px 0 0 25px;
+        background-color: #2196f3;
+        padding: 0.8rem 1.5rem 0.8rem 1.5rem;
+        color: #fff;
+        box-shadow: 0 0.2rem 0.2rem #888888;
+      }
+    </style>
+    <div
+      id="action"
+      style="
+        bottom: 3rem;
+        position: fixed;
+        width: 100%;
+        height: 80px;
+        z-index: 99999;
+        text-align: center;
+      "
+    >
+      <div class="btn btn-return" onclick="btnReturn();">返回</div>
+      {if !isset($_GET['is_demo'])}
+      <div class="btn btn-make" onclick="btnMake();">点击制作</div>
+      {/if}
+    </div>
+
+    <script>
+      function btnReturn() {
+          const url = '../index/index';
+          wx.miniProgram.navigateBack({
+
+          });
+          console.log("返回了")
+      }
+
+
+      function btnMake(){
+          {if request()->action() == 'show2'}
+          const url = "../make/make?type=user&id={$data.id}&public=1" ;
+          {else}
+          const url = "../make/make?id={:request()->get('demo_id')}" ;
+          {/if}
+          wx.miniProgram.navigateTo({
+              url: url
+          });
+          console.log("点击制作了")
+      }
+
+      function btnMakeData(){
+          this.btnMakeUrl();
+          console.log("点击制作了")
+      }
+    </script>
+    {else}
+    <script src="/template/jump.js?v1.0.7"></script>
+    {/if}
+    
+    
+    <script type="text/javascript">
+  
+      window.onload = function () {
+        setInterval("toggleSound()", 1000);
+        
+        $.get("https://20it.cn/api/addViews?id={$data.id}");
+        
+      };
+      function toggleSound() {
+        var music = document.getElementById("audio_music"); //获取ID
+        if (music.paused) {
+          //判读是否播放
+          music.paused = false;
+          music.play(); //没有就播放
+        }
+      }
+      //--创建页面监听，等待微信端页面加载完毕 触发音频播放
+      document.addEventListener("DOMContentLoaded", function () {
+        function audioAutoPlay() {
+          var audio = document.getElementById("audio_music");
+          audio.play();
+          document.addEventListener(
+            "WeixinJSBridgeReady",
+            function () {
+              audio.play();
+            },
+            false
+          );
+        }
+        audioAutoPlay();
+      });
+      //--创建触摸监听，当浏览器打开页面时，触摸屏幕触发事件，进行音频播放
+      document.addEventListener("touchstart", function () {
+        function audioAutoPlay() {
+          var audio = document.getElementById("audio_music");
+          audio.play();
+        }
+        audioAutoPlay();
+      });
+      /*
+       * Settings
+       */
+
+      const colors = [
+        "#eec996",
+        "#8fb7d3",
+        "#b7d4c6",
+        "#c3bedd",
+        "#f1d5e4",
+        "#cae1d3",
+        "#f3c89d",
+        "#d0b0c3",
+        "#819d53",
+        "#c99294",
+        "#cec884",
+        "#ff8e70",
+        "#e0a111",
+        "#fffdf6",
+        "#cbd7ac",
+        "#e8c6c0",
+        "#dc9898",
+        "#ecc8ba"
+      ]; //用来设置的颜色
+      var canvas = document.getElementById("canvas");
+      var ctx = canvas.getContext("2d");
+      let count = 1;
+
+      var ww = window.innerWidth;
+      var wh = window.innerHeight;
+
+      var hearts = [];
+
+      function init() {
+        requestAnimationFrame(render);
+        canvas.width = ww;
+        canvas.height = wh;
+        for (var i = 0; i < 100; i++) {
+          hearts.push(new Heart());
+        }
+      }
+
+      function Heart() {
+        this.x = Math.random() * ww;
+        this.y = Math.random() * wh;
+        this.opacity = Math.random() * 0.5 + 0.5;
+        this.vel = {
+          x: (Math.random() - 0.5) * 4,
+          y: (Math.random() - 0.5) * 4
+        };
+        this.targetScale = Math.random() * 0.15 + 0.02;
+        this.scale = this.targetScale * Math.random();
+      }
+
+      Heart.prototype.update = function (i) {
+        this.x += this.vel.x;
+        this.y += this.vel.y;
+
+        this.scale += (this.targetScale - this.scale) * 0.01;
+        if (this.x - this.width > ww || this.x + this.width < 0) {
+          this.scale = 0;
+          this.x = Math.random() * ww;
+        }
+        if (this.y - this.height > wh || this.y + this.height < 0) {
+          this.scale = 0;
+          this.y = Math.random() * wh;
+        }
+        this.width = 473.8;
+        this.height = 408.6;
+      };
+      Heart.prototype.draw = function (i) {
+        ctx.globalAlpha = this.opacity;
+        ctx.font = `${180 * this.scale}px "微软雅黑"`;
+        // ctx.font="20px";
+        ctx.fillStyle = colors[i % 18];
+        ctx.fillText(
+          "love💗",
+          this.x - this.width * 0.5,
+          this.y - this.height * 0.5,
+          this.width,
+          this.height
+        );
+        // ctx.drawImage(
+        //   heartImage,
+        //   this.x - this.width * 0.5,
+        //   this.y - this.height * 0.5,
+        //   this.width,
+        //   this.height
+        // );
+      };
+
+      function render() {
+        ctx.clearRect(0, 0, ww, wh);
+        // ctx.globalAlpha = 1;
+        // ctx.fillStyle = "rgba(255,255,255,0.3)";
+        // ctx.fillRect(0, 0, ww, wh);
+        for (var i = 0; i < 100; i++) {
+          hearts[i].update(i);
+          hearts[i].draw(i);
+        }
+        requestAnimationFrame(render);
+      }
+      init();
+
+      // var heartImage = new Image();
+      // heartImage.onload = init();
+      // heartImage.src =
+      //   "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NzMuOHB4IiBoZWlnaHQ9IjQwOC42cHgiIHZpZXdCb3g9IjAgMCA0NzMuOCA0MDguNiI+PHBhdGggZmlsbD0iI2QzMjkzMiIgZD0iTTQwNC42LDE2LjZDMzg1LjQsNi4xLDM2My41LDAsMzQwLDBjLTQxLjUsMC03OC41LDE4LjktMTAzLDQ4LjVDMjEyLjMsMTguOSwxNzUuMywwLDEzMy44LDAgYy0yMy4zLDAtNDUuMyw2LjEtNjQuNSwxNi42QzI3LjksMzkuNSwwLDgzLjQsMCwxMzMuOWMwLDE0LjQsMi40LDI4LjMsNi42LDQxLjJDMjkuNiwyNzguNCwyMzcsNDA4LjYsMjM3LDQwOC42IHMyMDcuMi0xMzAuMiwyMzAuMi0yMzMuNWM0LjMtMTIuOSw2LjYtMjYuOCw2LjYtNDEuMkM0NzMuOCw4My40LDQ0NS45LDM5LjYsNDA0LjYsMTYuNnoiLz48L3N2Zz4=";
+
+      window.addEventListener("resize", function () {
+        ww = window.innerWidth;
+        wh = window.innerHeight;
+      });
+    </script>
+    <script>
+      /*
+       * Settings
+       */
+      var settings = {
+        particles: {
+          length: 500, // maximum amount of particles
+          duration: 2, // particle duration in sec
+          velocity: 100, // particle velocity in pixels/sec
+          effect: -0.75, // play with this for a nice effect
+          size: 30 // particle size in pixels
+        }
+      };
+
+      /*
+       * RequestAnimationFrame polyfill by Erik M?ller
+       */
+      (function () {
+        var b = 0;
+        var c = ["ms", "moz", "webkit", "o"];
+        for (var a = 0; a < c.length && !window.requestAnimationFrame; ++a) {
+          window.requestAnimationFrame = window[c[a] + "RequestAnimationFrame"];
+          window.cancelAnimationFrame =
+            window[c[a] + "CancelAnimationFrame"] ||
+            window[c[a] + "CancelRequestAnimationFrame"];
+        }
+        if (!window.requestAnimationFrame) {
+          window.requestAnimationFrame = function (h, e) {
+            var d = new Date().getTime();
+            var f = Math.max(0, 16 - (d - b));
+            var g = window.setTimeout(function () {
+              h(d + f);
+            }, f);
+            b = d + f;
+            return g;
+          };
+        }
+        if (!window.cancelAnimationFrame) {
+          window.cancelAnimationFrame = function (d) {
+            clearTimeout(d);
+          };
+        }
+      })();
+
+      /*
+       * Point class
+       */
+      var Point = (function () {
+        function Point(x, y) {
+          this.x = typeof x !== "undefined" ? x : 0;
+          this.y = typeof y !== "undefined" ? y : 0;
+        }
+        Point.prototype.clone = function () {
+          return new Point(this.x, this.y);
+        };
+        Point.prototype.length = function (length) {
+          if (typeof length == "undefined")
+            return Math.sqrt(this.x * this.x + this.y * this.y);
+          this.normalize();
+          this.x *= length;
+          this.y *= length;
+          return this;
+        };
+        Point.prototype.normalize = function () {
+          var length = this.length();
+          this.x /= length;
+          this.y /= length;
+          return this;
+        };
+        return Point;
+      })();
+
+      /*
+       * Particle class
+       */
+
+      var Particle = (function () {
+        function Particle() {
+          this.position = new Point();
+          this.velocity = new Point();
+          this.acceleration = new Point();
+          this.age = 0;
+        }
+        Particle.prototype.initialize = function (x, y, dx, dy) {
+          this.position.x = x;
+          this.position.y = y;
+          this.velocity.x = dx;
+          this.velocity.y = dy;
+          this.acceleration.x = dx * settings.particles.effect;
+          this.acceleration.y = dy * settings.particles.effect;
+          this.age = 0;
+        };
+        Particle.prototype.update = function (deltaTime) {
+          this.position.x += this.velocity.x * deltaTime;
+          this.position.y += this.velocity.y * deltaTime;
+          this.velocity.x += this.acceleration.x * deltaTime;
+          this.velocity.y += this.acceleration.y * deltaTime;
+          this.age += deltaTime;
+        };
+        Particle.prototype.draw = function (context, image) {
+          function ease(t) {
+            return --t * t * t + 1;
+          }
+          var size = image.width * ease(this.age / settings.particles.duration);
+          context.globalAlpha = 1 - this.age / settings.particles.duration;
+          context.drawImage(
+            image,
+            this.position.x - size / 2,
+            this.position.y - size / 2,
+            size,
+            size
+          );
+        };
+        return Particle;
+      })();
+
+      /*
+       * ParticlePool class
+       */
+      var ParticlePool = (function () {
+        var particles,
+          firstActive = 0,
+          firstFree = 0,
+          duration = settings.particles.duration;
+
+        function ParticlePool(length) {
+          // create and populate particle pool
+          particles = new Array(length);
+          for (var i = 0; i < particles.length; i++)
+            particles[i] = new Particle();
+        }
+        ParticlePool.prototype.add = function (x, y, dx, dy) {
+          particles[firstFree].initialize(x, y, dx, dy);
+
+          // handle circular queue
+          firstFree++;
+          if (firstFree == particles.length) firstFree = 0;
+          if (firstActive == firstFree) firstActive++;
+          if (firstActive == particles.length) firstActive = 0;
+        };
+        ParticlePool.prototype.update = function (deltaTime) {
+          var i;
+
+          // update active particles
+          if (firstActive < firstFree) {
+            for (i = firstActive; i < firstFree; i++)
+              particles[i].update(deltaTime);
+          }
+          if (firstFree < firstActive) {
+            for (i = firstActive; i < particles.length; i++)
+              particles[i].update(deltaTime);
+            for (i = 0; i < firstFree; i++) particles[i].update(deltaTime);
+          }
+
+          // remove inactive particles
+          while (
+            particles[firstActive].age >= duration &&
+            firstActive != firstFree
+          ) {
+            firstActive++;
+            if (firstActive == particles.length) firstActive = 0;
+          }
+        };
+        ParticlePool.prototype.draw = function (context, image) {
+          // draw active particles
+          if (firstActive < firstFree) {
+            for (i = firstActive; i < firstFree; i++)
+              particles[i].draw(context, image);
+          }
+          if (firstFree < firstActive) {
+            for (i = firstActive; i < particles.length; i++)
+              particles[i].draw(context, image);
+            for (i = 0; i < firstFree; i++) particles[i].draw(context, image);
+          }
+        };
+        return ParticlePool;
+      })();
+
+      /*
+       * Putting it all together
+       */
+      (function (canvas) {
+        var context = canvas.getContext("2d"),
+          particles = new ParticlePool(settings.particles.length),
+          particleRate =
+            settings.particles.length / settings.particles.duration, // particles/sec
+          time;
+
+        // get point on heart with -PI <= t <= PI
+        function pointOnHeart(t) {
+          return new Point(
+            160 * Math.pow(Math.sin(t), 3),
+            130 * Math.cos(t) -
+              50 * Math.cos(2 * t) -
+              20 * Math.cos(3 * t) -
+              10 * Math.cos(4 * t) +
+              25
+          );
+        }
+
+        // creating the particle image using a dummy canvas
+        var image = (function () {
+          var canvas = document.createElement("canvas"),
+            context = canvas.getContext("2d");
+          canvas.width = settings.particles.size;
+          canvas.height = settings.particles.size;
+          // helper function to create the path
+          function to(t) {
+            var point = pointOnHeart(t);
+            point.x =
+              settings.particles.size / 2 +
+              (point.x * settings.particles.size) / 350;
+            point.y =
+              settings.particles.size / 2 -
+              (point.y * settings.particles.size) / 350;
+            return point;
+          }
+          // create the path
+          context.beginPath();
+          var t = -Math.PI;
+          var point = to(t);
+          context.moveTo(point.x, point.y);
+          while (t < Math.PI) {
+            t += 0.01; // baby steps!
+            point = to(t);
+            context.lineTo(point.x, point.y);
+          }
+          context.closePath();
+          // create the fill
+          context.fillStyle = "#ea80b0";
+          context.fill();
+          // create the image
+          var image = new Image();
+          image.src = canvas.toDataURL();
+          return image;
+        })();
+
+        // render that thing!
+        function render() {
+          // next animation frame
+          requestAnimationFrame(render);
+
+          // update time
+          var newTime = new Date().getTime() / 1000,
+            deltaTime = newTime - (time || newTime);
+          time = newTime;
+
+          // clear canvas
+          context.clearRect(0, 0, canvas.width, canvas.height);
+
+          // create new particles
+          var amount = particleRate * deltaTime;
+          for (var i = 0; i < amount; i++) {
+            var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
+            var dir = pos.clone().length(settings.particles.velocity);
+            particles.add(
+              canvas.width / 2 + pos.x,
+              canvas.height / 2 - pos.y,
+              dir.x,
+              -dir.y
+            );
+          }
+
+          // update and draw particles
+          particles.update(deltaTime);
+          particles.draw(context, image);
+        }
+
+        // handle (re-)sizing of the canvas
+        function onResize() {
+          canvas.width = canvas.clientWidth;
+          canvas.height = canvas.clientHeight;
+        }
+        window.onresize = onResize;
+
+        // delay rendering bootstrap
+        setTimeout(function () {
+          onResize();
+          render();
+        }, 10);
+      })(document.getElementById("pinkboard"));
+
+      // 参考：https://blog.csdn.net/weixin_57038822/article/details/121644240
+    </script>
+    <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?c314395e62fb55e30828e0ea8cca8b3a";
+      var s = document.getElementsByTagName("script")[0]; 
+      s.parentNode.insertBefore(hm, s);
+    })();
+    </script>
+  </body>
+</html>

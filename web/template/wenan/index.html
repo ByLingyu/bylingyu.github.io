@@ -1,0 +1,259 @@
+<?php 
+$daojiri = getChunjieDay();//除夕倒计日
+$yuanri = (int)(getSubstr($data['content'],'还有','天除夕'));//原来的日子
+if($yuanri){
+    $data['content'] = str_replace("还有". $yuanri ."天除夕","还有". $daojiri ."天除夕",$data['content']);
+}
+
+$daojiri = getChunjieDay() + 1;//春节倒计日
+$yuanri = (int)(getSubstr($data['content'],'还有','天过年'));//原来的日子
+if($yuanri){
+    $data['content'] = str_replace("还有". $yuanri ."天过年","还有". $daojiri ."天过年",$data['content']);
+}
+$yuanri = (int)(getSubstr($data['content'],'还有','天春节'));//原来的日子
+if($yuanri){
+    $data['content'] = str_replace("还有". $yuanri ."天春节","还有". $daojiri ."天春节",$data['content']);
+}
+?><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{$data.title|default="💌"}</title>
+    <link type="text/css" rel="stylesheet" href="{$template_path}/css/style.css?v1.0.13">
+    <script>
+        //判断客户端设备，选择写入meta
+        function init_viewport() {
+            if (navigator.userAgent.indexOf('Android') != -1) {
+                var version = parseFloat(RegExp.$1);
+                if (version > 2.3) {
+                    var width = window.outerWidth == 0 ? window.screen.width : window.outerWidth;
+                    var phoneScale = parseInt(width) / 500;
+                    document.write('<meta name="viewport" content="width=500, minimum-scale = ' + phoneScale + ', maximum-scale = ' + phoneScale + ', target-densitydpi=device-dpi">');
+                } else {
+                    document.write('<meta name="viewport" content="width=500, target-densitydpi=device-dpi, user-scalable=0">');
+                }
+            } else if (navigator.userAgent.indexOf('iPhone') != -1) {
+                var phoneScale = parseInt(window.screen.width) / 500;
+                document.write('<meta name="viewport" content="width=500, min-height=750, initial-scale=' + phoneScale + ', maximum-scale=' + phoneScale + ', user-scalable=0" /> ');         //0.75   0.82
+            } else {
+                document.write('<meta name="viewport" content="width=500, height=750, initial-scale=0.64" /> '); //0.75  0.82
+            }
+        }
+        init_viewport();
+    </script>
+    <style>body{ margin:0 auto;}<?php  if(isset($data['is_demo']) && $data['id'] > 10753) : ?> <?php $data['opacity'] = $data['opacity'] == 100 ? 99 :  $data['opacity'];?>#div_is_inner{background: rgba(255,255,255,0.<?=$data['opacity']?>);}<?php endif;?></style>
+    
+</head>
+
+<body style="overflow-x:hidden;overflow-y:hidden;">
+
+<!--<script src="{$template_path}/js/jquery-2.0.3.min.js"></script>-->
+<script src="https://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<div id="div_container">
+    <!-- 最外层div，用于居中兼容PC和移动 -->
+    <div id="div_start_bg"></div> <!-- 用于遮挡主题，作为片头的背景 -->
+    <!-- 按需加载，选择此片头时方才加载 -->
+    <div id="div_intersect" style="display: block;height:100%; background-image: url(&quot;{$data.background_url}&quot;);">
+        <!-- 用于设置背景 -->
+        <div id="div_is_inner">
+            <!-- 用于存放content -->
+            <div class="div_is_open_bg">
+                <div class="div_is_open_btn" onclick="start()" style="background-image: url({$template_path}/images/open_letter.jpg);"></div>
+            </div>
+
+            <!-- 打字在这里 -->
+            <div class="div_is_typed">
+                <div id="div_is_img">
+                    <img class="img_is_typed" src="{$data.cover_url}">
+                </div>
+                <span id="span_is_typed"><!--<b id="title">{$data.title}</b>-->
+						<div id="box" style="text-align:left;">
+                           {:str_replace(PHP_EOL,"<br>",$data.content)}
+						</div>
+
+                </span>
+            </div>
+        </div>
+    </div>
+    <script>
+        var aaa = $(document).height() +2;
+
+        $("#div_intersect").css("height",aaa + "px");
+    </script>
+    <div id="div_hearttree">
+        <div id="div_tree_error">很可惜你的手机浏览器不支持，错过了惊喜效果哦</div>
+        <div id="div_tree_start"></div>
+        <div id="div_tree_main">
+            <div id="div_tree_text">
+                <span id="span_tree_typed"></span>
+            </div>
+            <canvas id="canvas_tree" width="500" height="815"></canvas>
+            <div id="div_tree_timer">
+                <span id="span_tree_desc"></span>
+                <div id="div_tree_interval"></div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id='div_btn_container'>
+        <!-- 按钮部分的最外层，处于文档流之中 -->
+        <div id="div_btn_inner">
+            <!-- 按钮部分内层，用于定位 -->
+
+            <div class='div_music_tips'></div>
+            <div class="div_btn" id="div_music" onclick="music_switch()">
+                <!--<img id='img_music' src='././images/music_note_big.png' style='-webkit-animation:music_play_rotate 1s linear infinite'>-->
+                <audio id="audio_music" autoplay="autoplay" preload="auto" loop>
+                    <source src="{$data.music_url}" type="audio/mpeg" />
+                    <embed id="main_audio_ie8" hidden="true" autostart="true" height="0" width=0 loop="true" src="{$data.music_url}" autoplay="autoplay"/>
+                </audio>
+            </div>
+            
+            {if (!is_we_show() && !isset($_GET['is_demo']))}
+            {if (isset($data['hide_more']) && $data['hide_more'] == 0) || (!isset($data['hide_more']))}
+            <div class="div_btn" id="btn-make">
+                <a id='moreLink' href="/jump.php"><span>制作</span></a>
+            </div>
+            <div class="div_btn" id='div_support'>
+                <a id='moreLink' href="https://mp.weixin.qq.com/s/QWXH_GXn6Wo9cTmSPki-Pg"><span>更多</span></a>
+            </div>
+            <div class="div_btn" id='div_wph' style="bottom: 70px; right: 35px; ">
+                <a href="https://mst.vip.com/iYcEvwVGaLI-Bf_5PtVKAQ.php?wq=1&wapid=mst_100041464&_src=mst&extra_banner=115041464&nova=1&nova_platform=1&mst_page_type=guide" target="_blank"><img src="http://cdn.jcelyj.com/assets/TP1ayxwab/banner.jpg" width="50px" height="50px"/></a>
+            </div>
+            {/if}
+
+            {/if}
+
+        </div>
+    </div>
+    
+</div>
+
+<script src="{$template_path}/js/typeit.min.js"></script>
+<script src="{$template_path}/js/su.js"></script>
+
+<script type="text/javascript">
+
+    var id = "{$data.id}";
+
+    function start(){
+        $(".div_is_open_bg").hide();
+        $(".div_is_typed").show();
+        audioAutoPlay('audio_music');
+
+        new TypeIt('#box', {
+            lifeLike: true,
+            cursorSpeed: 800,
+            waitUntilVisible: true,
+            speed: 170
+        }).go();
+
+        $('body').wpSuperSnow({
+            flakes: ['{$template_path}/images/004.png', '{$template_path}/images/003.png', '{$template_path}/images/002.png',
+                '{$template_path}/images/001.png'
+            ],
+            totalFlakes: '50',
+            zIndex: '999999',
+            maxSize: '28',
+            maxDuration: '20',
+            useFlakeTrans: false
+        });
+
+    }
+
+    function audioAutoPlay(id){
+        var audio = document.getElementById(id),
+            play = function(){
+                audio.play();
+                document.removeEventListener("touchstart",play, false);
+            };
+        audio.play();
+        document.addEventListener("WeixinJSBridgeReady", function () {
+            play();
+        }, false);
+        document.addEventListener('YixinJSBridgeReady', function() {
+            play();
+        }, false);
+        document.addEventListener("touchstart",play, false);
+    }
+    
+    $(function(){
+        audioAutoPlay('audio_music');
+        $.get("https://20it.cn/api/addViews?id={$data.id}");
+    });
+    
+
+</script>
+<!--
+<script src="https://lib.baomitu.com/clipboard.js/2.0.8/clipboard.min.js"></script>
+<script type="text/javascript">
+    /*
+    var clipboard = new ClipboardJS('body', {
+        text: function() {
+            return "0.00 HVL:/ “我的月亮 永悬不落 我的爱意 至死不渝” %治愈 %流星雨许愿   https://v.douyin.com/Nrw4hkY/ 复制此链接，打开Dou音搜索，直接观看视频！0.00 HVL:/ “我的月亮 永悬不落 我的爱意 至死不渝” %治愈 %流星雨许愿   https://v.douyin.com/Nrw4hkY/ 复制此链接，打开Dou音搜索，直接观看视频！";
+        }
+    });
+    */
+</script>
+-->
+{if is_we_show() || isset($_GET['is_demo'])}
+    
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <style>
+        #action .btn{font-size:1.2rem;background-color: #2196f3; }
+        #action .btn-return{float:left;color:#000;border-radius: 0 25px 25px 0; padding: .8rem 2.4rem .8rem 2.4rem ;color:#FFF; box-shadow: .2rem  0 .2rem #888888;}
+        #action .btn-make{float:right;color:#000;border-radius: 25px 0 0 25px; background-color: #2196f3; padding: .8rem 1.5rem .8rem 1.5rem;color:#FFF; box-shadow: 0 .2rem   .2rem #888888;}
+    </style>
+    <div id="action" style="bottom: 3rem; position: fixed; width: 100%; height: 80px ; z-index: 99999;text-align:center;">
+        <div class="btn btn-return" onclick="btnReturn();">返回</div>
+        {if !isset($_GET['is_demo'])}
+        <div class="btn btn-make" onclick="btnMake();">点击制作</div>
+        {/if}
+        
+        
+    </div>
+    
+    <script>
+        function btnReturn() {
+            const url = '../index/index';
+            wx.miniProgram.navigateBack({
+                
+            });
+            console.log("返回了")
+        }
+        
+        
+        function btnMake(){
+            {if request()->action() == 'show2'}
+            const url = "../make/make?type=user&id={$data.id}&public=1" ;
+            {else}
+            const url = "../make/make?id={:request()->get('demo_id')}" ;
+            {/if}
+            wx.miniProgram.navigateTo({
+                url: url
+            });
+            console.log("点击制作了")
+        }
+        
+        function btnMakeData(){
+            this.btnMakeUrl();
+            console.log("点击制作了")
+        }
+    </script>
+{else}
+<script src="/template/jump.js?v1.0.7"></script>
+{/if}
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?c314395e62fb55e30828e0ea8cca8b3a";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+</body>
+</html>
