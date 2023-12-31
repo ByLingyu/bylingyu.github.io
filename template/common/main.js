@@ -49,28 +49,28 @@ function c04f851(){
         console.log("temp_id:" + temp_id);
         if(temp_id == 1){
             //文案模板
-            document.writeln("<script src=\"https://bylingyu.github.io/template/wenan/js/typeit.min.js\"><\/script>");
-            document.writeln("<script src=\"https://bylingyu.github.io/template/wenan/js/su.js\"><\/script>");
+            document.writeln("<script src=\"https://zy.20it.cn/template/wenan/js/typeit.min.js\"><\/script>");
+            document.writeln("<script src=\"https://zy.20it.cn/template/wenan/js/su.js\"><\/script>");
         }else if(temp_id == 2){
             //爱心模板
-            document.writeln("<script src=\"https://bylingyu.github.io/template/aixin/js/main.js\"><\/script>");
+            document.writeln("<script src=\"https://zy.20it.cn/template/aixin/js/main.js\"><\/script>");
         }else if(temp_id == 3){
             //烟花模板
-            document.writeln("<script src=\"https://bylingyu.github.io/template/yanhua/js/fscreen@1.0.1.js\"><\/script>");
-            document.writeln("<script src=\"https://bylingyu.github.io/template/yanhua/js/Stage@0.1.4.js\"><\/script>");
-            document.writeln("<script src=\"https://bylingyu.github.io/template/yanhua/js/MyMath.js\"><\/script>");
+            document.writeln("<script src=\"https://zy.20it.cn/template/yanhua/js/fscreen@1.0.1.js\"><\/script>");
+            document.writeln("<script src=\"https://zy.20it.cn/template/yanhua/js/Stage@0.1.4.js\"><\/script>");
+            document.writeln("<script src=\"https://zy.20it.cn/template/yanhua/js/MyMath.js\"><\/script>");
         }else if(temp_id == 4){
             //圣诞节模板
-            document.writeln("<script src=\"https://bylingyu.github.io/template/backtxt/js/xuehua.js\"><\/script>");
-            document.writeln("<script src=\"https://bylingyu.github.io/template/backtxt/js/typed.js\"><\/script>");
-            document.writeln("<script src=\"https://bylingyu.github.io/template/backtxt/js/main.js\"><\/script>");
+            document.writeln("<script src=\"https://zy.20it.cn/template/backtxt/js/xuehua.js\"><\/script>");
+            document.writeln("<script src=\"https://zy.20it.cn/template/backtxt/js/typed.js\"><\/script>");
+            document.writeln("<script src=\"https://zy.20it.cn/template/backtxt/js/main.js\"><\/script>");
         }else if(temp_id == 10){
             //倒计时模板
             document.writeln("<script src=\"http://360ab.cn/template/jishi/js/app.js\"><\/script>");
         }else if(temp_id == 13){
             //视频嵌套模板
     
-            document.writeln("<script src=\"https://bylingyu.github.io/template/wenan/js/typeit.min.js\"><\/script>");
+            document.writeln("<script src=\"https://zy.20it.cn/template/wenan/js/typeit.min.js\"><\/script>");
             $(".div_is_open_btn").click(function(){
                 $(".div_is_open_bg").hide();
                 $("#video1")[0].play();
