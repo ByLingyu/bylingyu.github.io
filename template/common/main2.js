@@ -203,7 +203,7 @@ function CountDownAll(year, month, day, hours) {
     let minute = Math.floor((leftsecond - day * 24 * 60 * 60 - hour * 3600) / 60);
     let second = Math.floor(leftTime / 1000 % 60, 10);
     //CountDown(2050, 12, 31, 24)
-    return `${day}天${hour}小时${minute}分钟`;
+    return `已经成功`;//`${day}天${hour}小时${minute}分钟`
 }
 
 
