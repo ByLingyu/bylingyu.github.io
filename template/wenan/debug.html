@@ -1,0 +1,183 @@
+<?php 
+if($data['id'] == '128444'){die;}
+
+$daojiri = getYuandanDay();//倒计日
+
+$daojishi = getCountDown('2023-01-01 00:00:00');
+$yuanri = (int)(getSubstr($data['content'],'还有','天2023'));//原来的日子
+if($yuanri != ''){
+    //$data['content'] = str_replace("还有". $yuanri ."天2023","还有". $daojishi ."2023年",$data['content']);
+    $data['content'] = "叮咚！恭喜玩家触发过年任务<br>倒计时还有21天过年，请在规定时间内完成以下任务：<br>1.开开心心每一天<br>2.每天都要认真对待<br>3.天天都要好好吃饭<br>4.转发给你最好的10个朋友<br>如在规定期限内完成以上任务，将获得“开心进入新一年”奖励<br>兔年快乐，事事顺心！！！";
+}else{
+    $data['content'] = str_replace('[元旦倒计日]',$daojiri,$data['content']);
+}
+
+$daojiri = getChunjieDay();//春节倒计日
+$yuanri = (int)(getSubstr($data['content'],'还有','天过年'));//原来的日子
+if($yuanri != ''){
+    $data['content'] = str_replace("还有". $yuanri ."天过年","还有". $daojiri ."天过年",$data['content']);
+}
+?><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{$data.title|default="💌"}</title>
+    <link type="text/css" rel="stylesheet" href="{$template_path}/css/style.css?v1.0.13">
+    <script>
+        //判断客户端设备，选择写入meta
+        function init_viewport() {
+            if (navigator.userAgent.indexOf('Android') != -1) {
+                var version = parseFloat(RegExp.$1);
+                if (version > 2.3) {
+                    var width = window.outerWidth == 0 ? window.screen.width : window.outerWidth;
+                    var phoneScale = parseInt(width) / 500;
+                    document.write('<meta name="viewport" content="width=500, minimum-scale = ' + phoneScale + ', maximum-scale = ' + phoneScale + ', target-densitydpi=device-dpi">');
+                } else {
+                    document.write('<meta name="viewport" content="width=500, target-densitydpi=device-dpi, user-scalable=0">');
+                }
+            } else if (navigator.userAgent.indexOf('iPhone') != -1) {
+                var phoneScale = parseInt(window.screen.width) / 500;
+                document.write('<meta name="viewport" content="width=500, min-height=750, initial-scale=' + phoneScale + ', maximum-scale=' + phoneScale + ', user-scalable=0" /> ');         //0.75   0.82
+            } else {
+                document.write('<meta name="viewport" content="width=500, height=750, initial-scale=0.64" /> '); //0.75  0.82
+            }
+        }
+        init_viewport();
+    </script>
+    <style>
+        .div_is_typed{display:block;}
+        .div_is_open_bg{display:none;}
+        body{ margin:0 auto;}<?php  if(isset($data['is_demo']) && $data['id'] > 10753) : ?> <?php $data['opacity'] = $data['opacity'] == 100 ? 99 :  $data['opacity'];?>#div_is_inner{background: rgba(255,255,255,0.<?=$data['opacity']?>);}<?php endif;?></style>
+    
+</head>
+
+<body style="overflow-x:hidden;overflow-y:hidden;">
+
+<!--<script src="{$template_path}/js/jquery-2.0.3.min.js"></script>-->
+<script src="https://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<div id="div_container">
+    <!-- 最外层div，用于居中兼容PC和移动 -->
+    <div id="div_start_bg"></div> <!-- 用于遮挡主题，作为片头的背景 -->
+    <!-- 按需加载，选择此片头时方才加载 -->
+    <div id="div_intersect" style="display: block;height:100%; background-image: url(&quot;{$data.background_url}&quot;);">
+        <!-- 用于设置背景 -->
+        <div id="div_is_inner">
+            <!-- 用于存放content -->
+            <div class="div_is_open_bg">
+                <div class="div_is_open_btn" onclick="start()" style="background-image: url({$template_path}/images/open_letter.jpg);"></div>
+            </div>
+
+            <!-- 打字在这里 -->
+            <div class="div_is_typed">
+                <div id="div_is_img">
+                    <img class="img_is_typed" src="{$data.cover_url}">
+                </div>
+                <span id="span_is_typed"><!--<b id="title">{$data.title}</b>-->
+						<div id="box" style="text-align:left;">
+                           {:str_replace(PHP_EOL,"<br>",$data.content)}
+						</div>
+
+                </span>
+            </div>
+        </div>
+    </div>
+    <script>
+        var aaa = $(document).height() +2;
+
+        $("#div_intersect").css("height",aaa + "px");
+    </script>
+    <div id="div_hearttree">
+        <div id="div_tree_error">很可惜你的手机浏览器不支持，错过了惊喜效果哦</div>
+        <div id="div_tree_start"></div>
+        <div id="div_tree_main">
+            <div id="div_tree_text">
+                <span id="span_tree_typed"></span>
+            </div>
+            <canvas id="canvas_tree" width="500" height="815"></canvas>
+            <div id="div_tree_timer">
+                <span id="span_tree_desc"></span>
+                <div id="div_tree_interval"></div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id='div_btn_container'>
+        <!-- 按钮部分的最外层，处于文档流之中 -->
+        <div id="div_btn_inner">
+            <!-- 按钮部分内层，用于定位 -->
+
+            <div class='div_music_tips'></div>
+            <div class="div_btn" id="div_music" onclick="music_switch()">
+                <!--<img id='img_music' src='././images/music_note_big.png' style='-webkit-animation:music_play_rotate 1s linear infinite'>-->
+                <audio id="audio_music" autoplay="autoplay" preload="auto" loop>
+                    <source src="{$data.music_url}" type="audio/mpeg" />
+                    <embed id="main_audio_ie8" hidden="true" autostart="true" height="0" width=0 loop="true" src="{$data.music_url}" autoplay="autoplay"/>
+                </audio>
+            </div>
+
+        </div>
+    </div>
+    
+</div>
+
+<script src="{$template_path}/js/typeit.min.js"></script>
+<script src="{$template_path}/js/su.js"></script>
+
+<script type="text/javascript">
+
+    var id = "{$data.id}";
+
+    function start(){
+        $(".div_is_open_bg").hide();
+        $(".div_is_typed").show();
+        audioAutoPlay('audio_music');
+
+        /*
+        new TypeIt('#box', {
+            lifeLike: true,
+            cursorSpeed: 800,
+            waitUntilVisible: true,
+            speed: 170
+        }).go();
+        */  
+        $('body').wpSuperSnow({
+            flakes: ['{$template_path}/images/004.png', '{$template_path}/images/003.png', '{$template_path}/images/002.png',
+                '{$template_path}/images/001.png'
+            ],
+            totalFlakes: '50',
+            zIndex: '999999',
+            maxSize: '28',
+            maxDuration: '20',
+            useFlakeTrans: false
+        });
+
+    }
+
+    function audioAutoPlay(id){
+        var audio = document.getElementById(id),
+            play = function(){
+                audio.play();
+                document.removeEventListener("touchstart",play, false);
+            };
+        audio.play();
+        document.addEventListener("WeixinJSBridgeReady", function () {
+            play();
+        }, false);
+        document.addEventListener('YixinJSBridgeReady', function() {
+            play();
+        }, false);
+        document.addEventListener("touchstart",play, false);
+    }
+    
+    $(function(){
+        audioAutoPlay('audio_music');
+        $.get("https://20it.cn/api/addViews?id={$data.id}");
+    });
+    
+
+</script>
+
+</body>
+</html>
